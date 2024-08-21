@@ -11,7 +11,23 @@
 		68D3B8E92C64BBF600B65EC8 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68D3B8E82C64BBF600B65EC8 /* ViewController.swift */; };
 		68D3B8EB2C64BBFE00B65EC8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 68D3B8EA2C64BBFE00B65EC8 /* Assets.xcassets */; };
 		68D3B8EE2C64BBFE00B65EC8 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 68D3B8EC2C64BBFE00B65EC8 /* Main.storyboard */; };
+		68D3B8F72C64BC9D00B65EC8 /* WindowObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68D3B8F62C64BC9D00B65EC8 /* WindowObserver.swift */; };
+		68D3B8FA2C65259500B65EC8 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68D3B8F92C65259500B65EC8 /* Logger.swift */; };
+		68D3B8FC2C65290800B65EC8 /* EdgeWindow.app in CopyFiles */ = {isa = PBXBuildFile; fileRef = 68D3B8E32C64BBF600B65EC8 /* EdgeWindow.app */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		68D3B8FB2C6528DA00B65EC8 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /Applications;
+			dstSubfolderSpec = 0;
+			files = (
+				68D3B8FC2C65290800B65EC8 /* EdgeWindow.app in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		68D3B8E32C64BBF600B65EC8 /* EdgeWindow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EdgeWindow.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -20,6 +36,9 @@
 		68D3B8EA2C64BBFE00B65EC8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		68D3B8ED2C64BBFE00B65EC8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		68D3B8EF2C64BBFE00B65EC8 /* EdgeWindow.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = EdgeWindow.entitlements; sourceTree = "<group>"; };
+		68D3B8F52C64BC2C00B65EC8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		68D3B8F62C64BC9D00B65EC8 /* WindowObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowObserver.swift; sourceTree = "<group>"; };
+		68D3B8F92C65259500B65EC8 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,7 +71,10 @@
 		68D3B8E52C64BBF600B65EC8 /* EdgeWindow */ = {
 			isa = PBXGroup;
 			children = (
+				68D3B8F52C64BC2C00B65EC8 /* Info.plist */,
 				68D3B8E62C64BBF600B65EC8 /* AppDelegate.swift */,
+				68D3B8F62C64BC9D00B65EC8 /* WindowObserver.swift */,
+				68D3B8F92C65259500B65EC8 /* Logger.swift */,
 				68D3B8E82C64BBF600B65EC8 /* ViewController.swift */,
 				68D3B8EA2C64BBFE00B65EC8 /* Assets.xcassets */,
 				68D3B8EC2C64BBFE00B65EC8 /* Main.storyboard */,
@@ -71,6 +93,8 @@
 				68D3B8DF2C64BBF500B65EC8 /* Sources */,
 				68D3B8E02C64BBF500B65EC8 /* Frameworks */,
 				68D3B8E12C64BBF500B65EC8 /* Resources */,
+				68D3B8F82C6522DA00B65EC8 /* Link Product to Workspace */,
+				68D3B8FB2C6528DA00B65EC8 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -126,6 +150,27 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		68D3B8F82C6522DA00B65EC8 /* Link Product to Workspace */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Link Product to Workspace";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -euo pipefail\n\nif [[ \"$CONFIGURATION\" != \"Debug\" ]]; then\n    echo \"Skip to copy product for $CONFIGURATION mode!\"\n    exit 0\nfi\n\nTARGET_BASE_PATH=\"$PROJECT_DIR/.build\"\n\nif [[ ! -e \"$TARGET_BASE_PATH\" ]]; then\n    mkdir -p $TARGET_BASE_PATH\n    echo \"Created directory $TARGET_BASE_PATH\"\nfi\n\nPRODUCT_FULL_PATH=\"$BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME\"\nTARGET_EXE_PATH=\"$TARGET_BASE_PATH/$FULL_PRODUCT_NAME\"\n\nif [[ ! -e \"$PRODUCT_FULL_PATH\" ]]; then\n    echo \"Product $PRODUCT_FULL_PATH doesn't exist!\"\n    exit 1\nfi\n\nrm -fr \"$TARGET_BASE_PATH/$FULL_PRODUCT_NAME\"\nln -s \"$PRODUCT_FULL_PATH\" \"$TARGET_EXE_PATH\"\n\necho \"Created symbolic link at $TARGET_EXE_PATH\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		68D3B8DF2C64BBF500B65EC8 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -133,6 +178,8 @@
 			files = (
 				68D3B8E92C64BBF600B65EC8 /* ViewController.swift in Sources */,
 				68D3B8E72C64BBF600B65EC8 /* AppDelegate.swift in Sources */,
+				68D3B8F72C64BC9D00B65EC8 /* WindowObserver.swift in Sources */,
+				68D3B8FA2C65259500B65EC8 /* Logger.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -271,10 +318,12 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = EdgeWindow/EdgeWindow.entitlements;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = EdgeWindow/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMainStoryboardFile = Main;
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
@@ -285,6 +334,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.the-effective-group.EdgeWindow";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -296,10 +346,12 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = EdgeWindow/EdgeWindow.entitlements;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = EdgeWindow/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMainStoryboardFile = Main;
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
@@ -310,6 +362,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.the-effective-group.EdgeWindow";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
