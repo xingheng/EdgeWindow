@@ -47,7 +47,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
-        windowObserver = WindowObserver(NSEdgeInsets(top: 50, left: 50, bottom: 50, right: 50))
+        windowObserver = WindowObserver()
+        windowObserver.startObserving()
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
@@ -87,6 +88,8 @@ extension AppDelegate {
         if alert.runModal() == .alertFirstButtonReturn {
             NSWorkspace.shared.open(URL(string:"x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!)
         }
+
+        NSApp.terminate(nil)
     }
 }
 
