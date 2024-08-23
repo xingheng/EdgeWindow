@@ -717,6 +717,22 @@
                                         <view key="view" id="NTw-kT-qXc">
                                             <rect key="frame" x="10" y="33" width="434" height="228"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                            <subviews>
+                                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="BdD-u9-WNr">
+                                                    <rect key="frame" x="15" y="193" width="105" height="18"/>
+                                                    <buttonCell key="cell" type="check" title="Start at login" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="rJQ-Ud-dDr">
+                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                        <font key="font" metaFont="system"/>
+                                                    </buttonCell>
+                                                    <connections>
+                                                        <action selector="onStartAtLoginButtonClicked:" target="XfG-lQ-9wD" id="Rb2-D3-NlA"/>
+                                                    </connections>
+                                                </button>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="BdD-u9-WNr" firstAttribute="leading" secondItem="NTw-kT-qXc" secondAttribute="leading" constant="17" id="5Tg-Es-gB8"/>
+                                                <constraint firstItem="BdD-u9-WNr" firstAttribute="top" secondItem="NTw-kT-qXc" secondAttribute="top" constant="18" id="Ejt-0V-7gu"/>
+                                            </constraints>
                                         </view>
                                     </tabViewItem>
                                     <tabViewItem label="Screen" identifier="" id="DJY-Po-L2S">
@@ -880,6 +896,7 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="btnStartAtLogin" destination="BdD-u9-WNr" id="ZYG-M1-5lB"/>
                         <outlet property="popupScreens" destination="iWy-1Z-fFX" id="62h-vA-lxN"/>
                         <outlet property="tfBottom" destination="QzU-Nd-Epw" id="TXA-Nh-HuH"/>
                         <outlet property="tfLeft" destination="Xzd-wY-Wyz" id="yN4-au-gf0"/>

@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		6852C7F72C78B2E50051EC9F /* NSScreen+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6852C7F62C78B2E50051EC9F /* NSScreen+.swift */; };
+		6852C7FA2C78F09F0051EC9F /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6852C7F92C78F09F0051EC9F /* ApplicationServices.framework */; platformFilter = maccatalyst; };
+		6852C7FC2C78F0A90051EC9F /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6852C7FB2C78F0A90051EC9F /* ServiceManagement.framework */; platformFilter = maccatalyst; };
 		68B1F1762C77389500B8C6D9 /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68B1F1752C77389500B8C6D9 /* Configuration.swift */; };
 		68D3B8E72C64BBF600B65EC8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68D3B8E62C64BBF600B65EC8 /* AppDelegate.swift */; };
 		68D3B8E92C64BBF600B65EC8 /* SettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68D3B8E82C64BBF600B65EC8 /* SettingViewController.swift */; };
@@ -33,6 +35,8 @@
 
 /* Begin PBXFileReference section */
 		6852C7F62C78B2E50051EC9F /* NSScreen+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSScreen+.swift"; sourceTree = "<group>"; };
+		6852C7F92C78F09F0051EC9F /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = System/Library/Frameworks/ApplicationServices.framework; sourceTree = SDKROOT; };
+		6852C7FB2C78F0A90051EC9F /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
 		68B1F1752C77389500B8C6D9 /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
 		68D3B8E32C64BBF600B65EC8 /* EdgeWindow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EdgeWindow.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		68D3B8E62C64BBF600B65EC8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -50,17 +54,29 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6852C7FA2C78F09F0051EC9F /* ApplicationServices.framework in Frameworks */,
+				6852C7FC2C78F0A90051EC9F /* ServiceManagement.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6852C7F82C78F09E0051EC9F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				6852C7FB2C78F0A90051EC9F /* ServiceManagement.framework */,
+				6852C7F92C78F09F0051EC9F /* ApplicationServices.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		68D3B8DA2C64BBF500B65EC8 = {
 			isa = PBXGroup;
 			children = (
 				68D3B8E52C64BBF600B65EC8 /* EdgeWindow */,
 				68D3B8E42C64BBF600B65EC8 /* Products */,
+				6852C7F82C78F09E0051EC9F /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};

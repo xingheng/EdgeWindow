@@ -6,8 +6,11 @@
 //
 
 import Cocoa
+import ServiceManagement
 
 class SettingViewController: NSViewController {
+
+    @IBOutlet weak var btnStartAtLogin: NSButton!
 
     @IBOutlet weak var popupScreens: NSPopUpButton!
 
@@ -24,6 +27,8 @@ class SettingViewController: NSViewController {
             formatter.usesSignificantDigits = false
         }
 
+        btnStartAtLogin.state = getLoginItemStatus() ? .on : .off
+
         tfTop.formatter = numberFormatter
         tfLeft.formatter = numberFormatter
         tfBottom.formatter = numberFormatter
@@ -37,6 +42,10 @@ class SettingViewController: NSViewController {
         onPopupScreenChanged(self)
     }
 
+    @IBAction func onStartAtLoginButtonClicked(_ sender: Any) {
+        setLoginItem(enabled: btnStartAtLogin.state == .on)
+    }
+
     @IBAction func onPopupScreenChanged(_ sender: Any) {
         let idx = popupScreens.indexOfSelectedItem
         let screen = Configuration.shared.screens[idx]
@@ -45,6 +54,31 @@ class SettingViewController: NSViewController {
         tfLeft.stringValue = String(format: "%.2f", screen.edgeInset.left)
         tfBottom.stringValue = String(format: "%.2f", screen.edgeInset.bottom)
         tfRight.stringValue = String(format: "%.2f", screen.edgeInset.right)
+    }
+}
+
+extension SettingViewController {
+
+    private enum PreferenceKey: String {
+        case loginItemStatus
+    }
+
+    func setLoginItem(enabled: Bool) {
+        let launcherAppIdentifier = Bundle.main.bundleIdentifier!
+        let success = SMLoginItemSetEnabled(launcherAppIdentifier as CFString, enabled)
+
+        if success {
+            UserDefaults.standard.set(enabled, forKey: PreferenceKey.loginItemStatus.rawValue)
+            UserDefaults.standard.synchronize()
+            Logger.info("Login item set to \(enabled)")
+        } else {
+            btnStartAtLogin.state = enabled ? .off : .on
+            Logger.error("Failed to set login item")
+        }
+    }
+
+    func getLoginItemStatus() -> Bool {
+        UserDefaults.standard.bool(forKey: PreferenceKey.loginItemStatus.rawValue)
     }
 }
 
