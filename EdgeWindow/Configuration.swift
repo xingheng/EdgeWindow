@@ -49,6 +49,10 @@ extension Configuration {
             }
         }
     }
+
+    func match(screen: NSScreen) -> Screen? {
+        screens.first { $0.screenID == screen.screenID }
+    }
 }
 
 class Screen: Equatable {
@@ -63,7 +67,7 @@ class Screen: Equatable {
     }
 
     init(_ screen: NSScreen) {
-        screenID = screen.deviceDescription[NSDeviceDescriptionKey(rawValue: "NSScreenNumber")] as? Int ?? 0
+        screenID = screen.screenID
         screenName = screen.localizedName
         edgeInset = NSEdgeInsetsZero
     }

@@ -48,16 +48,28 @@ func sizeFromAXValue(_ axValue: AXValue) -> CGSize? {
     return nil
 }
 
+fileprivate var validAppNames: [String] = .init()
+
 func getAllWindowsWithScreenInfo() -> [WindowInfo] {
     var windowInfos: [WindowInfo] = []
     let runningApps = NSWorkspace.shared.runningApplications
 
-    Logger.info("found \(runningApps.count) app(s)")
+    Logger.info("found \(runningApps.count) running app(s)")
+
+    #if DEBUG
+    validAppNames.append("Xcode")
+    #endif
 
     for app in runningApps {
         guard let appName = app.localizedName else {
             Logger.info("no named for app \(app) pid \(app.processIdentifier)")
             continue
+        }
+
+        if validAppNames.count > 0 {
+            guard validAppNames.contains(appName) else {
+                continue
+            }
         }
 
         let appRef = AXUIElementCreateApplication(app.processIdentifier)
@@ -95,7 +107,7 @@ func getAllWindowsWithScreenInfo() -> [WindowInfo] {
             }
 
             let frame = CGRect(origin: position, size: size)
-            let screen = NSScreen.screens.first(where: { $0.frame.contains(frame) })
+            let screen = NSScreen.screenContainingFrame(frame: frame)
             let windowInfo = WindowInfo(appName: appName, title: windowTitle, position: position, size: size, screen: screen, window: window, pid: app.processIdentifier)
             windowInfos.append(windowInfo)
 
@@ -103,74 +115,110 @@ func getAllWindowsWithScreenInfo() -> [WindowInfo] {
             Logger.debug("title: \(windowTitle ?? "<untitled>")")
             Logger.debug("pos: \(position)")
             Logger.debug("size: \(size)")
-            Logger.debug("screen: \(screen?.localizedName) \(screen?.visibleFrame) \(screen?.deviceDescription)")
+            Logger.debug("screen: \(String(describing: screen?.localizedName)) \(String(describing: screen?.visibleFrame)) \(screen?.deviceDescription ?? [:])")
         }
     }
 
     return windowInfos
 }
 
-func resizeWindows(_ windowInfos: [WindowInfo], inset: NSEdgeInsets) {
+func resizeWindows(_ windowInfos: [WindowInfo]) {
     for windowInfo in windowInfos {
-        let window = windowInfo.window
-
-        // for debug only
-        guard windowInfo.appName == "Finder" else {
+        guard let nsscreen = windowInfo.screen,
+            let screen = Configuration.shared.screens.first(where: { $0.screenID == nsscreen.screenID }) else {
             continue
         }
 
-        if NSEdgeInsetsEqual(inset, NSEdgeInsetsZero) == false {
-            var position = windowInfo.position
-            var size = windowInfo.size
+        let inset = screen.edgeInset
+        let window = windowInfo.window
+        let frame = NSRect(origin: windowInfo.position, size: windowInfo.size)
+        let validFrame = nsscreen.visibleFrame.inset(by: inset)
 
-            position.x += inset.left
-            position.y += inset.top
-            size.width -= inset.left + inset.right
-            size.height -= inset.top + inset.bottom
+        if validFrame.contains(frame) {
+            // No need to resize
+            continue
+        }
 
-            var positionSettable: DarwinBoolean = .init(false)
-            var sizeSettable: DarwinBoolean = .init(false)
+        let resultFrame = adjustedFrame(frame, in: validFrame)
+        var position = resultFrame.origin
+        var size = resultFrame.size
 
-            AXUIElementIsAttributeSettable(window, kAXPositionAttribute as CFString, &positionSettable)
-            AXUIElementIsAttributeSettable(window, kAXSizeAttribute as CFString, &sizeSettable)
+        Logger.info("window \(windowInfo.title ?? "untitled") - app: \(windowInfo.appName)")
+        Logger.debug("inset: \(inset) validFrame: \(validFrame)")
+        Logger.debug("source frame: \(frame)")
+        Logger.debug("target frame: \(resultFrame)")
 
-            Logger.debug("position settable: \(positionSettable) size settable: \(sizeSettable)")
+        var positionSettable: DarwinBoolean = .init(false)
+        var sizeSettable: DarwinBoolean = .init(false)
 
-            if sizeSettable.boolValue {
-                let value = AXValueCreate(.cgSize, &size)!
-                let result = AXUIElementSetAttributeValue(window, kAXSizeAttribute as CFString, value)
+        AXUIElementIsAttributeSettable(window, kAXPositionAttribute as CFString, &positionSettable)
+        AXUIElementIsAttributeSettable(window, kAXSizeAttribute as CFString, &sizeSettable)
 
-                Logger.info("window \(windowInfo.title ?? "untitled") - app: \(windowInfo.appName)")
-                Logger.info("\t old size: \(windowInfo.size)")
-                Logger.info("\t new size: \(size)")
+        Logger.debug("position settable: \(positionSettable) size settable: \(sizeSettable)")
 
-                if result == .success {
-                    Logger.info("set size succeed")
-                } else {
-                    Logger.error("set size failed \(result.rawValue)")
-                }
+        if sizeSettable.boolValue {
+            let value = AXValueCreate(.cgSize, &size)!
+            let result = AXUIElementSetAttributeValue(window, kAXSizeAttribute as CFString, value)
+
+            Logger.info("\t old size: \(windowInfo.size)")
+            Logger.info("\t new size: \(size)")
+
+            if result == .success {
+                Logger.info("set size succeed")
             } else {
-                Logger.info("window '\(windowInfo.title ?? "<untitled>")' of app '\(windowInfo.appName)' size is not settable")
+                Logger.error("set size failed \(result.rawValue)")
             }
+        } else {
+            Logger.info("window '\(windowInfo.title ?? "<untitled>")' of app '\(windowInfo.appName)' size is not settable")
+        }
 
-            if positionSettable.boolValue {
-                let value = AXValueCreate(.cgPoint, &position)!
-                let result = AXUIElementSetAttributeValue(window, kAXPositionAttribute as CFString, value)
+        if positionSettable.boolValue {
+            let value = AXValueCreate(.cgPoint, &position)!
+            let result = AXUIElementSetAttributeValue(window, kAXPositionAttribute as CFString, value)
 
-                Logger.info("window \(windowInfo.title ?? "untitled") - app: \(windowInfo.appName)")
-                Logger.info("\t old position: \(windowInfo.position)")
-                Logger.info("\t new position: \(position)")
+            Logger.info("\t old position: \(windowInfo.position)")
+            Logger.info("\t new position: \(position)")
 
-                if result == .success {
-                    Logger.info("set position succeed")
-                } else {
-                    Logger.error("set position failed \(result.rawValue)")
-                }
+            if result == .success {
+                Logger.info("set position succeed")
             } else {
-                Logger.info("window '\(windowInfo.title ?? "<untitled>")' of app '\(windowInfo.appName)' position is not settable")
+                Logger.error("set position failed \(result.rawValue)")
             }
+        } else {
+            Logger.info("window '\(windowInfo.title ?? "<untitled>")' of app '\(windowInfo.appName)' position is not settable")
         }
     }
+}
+
+private func adjustedFrame(_ frame: NSRect, in validFrame: NSRect) -> NSRect {
+    // Calculate the resulting frame
+    var resultFrame = frame
+
+    // Adjust the x position if the frame is out of bounds
+    if resultFrame.origin.x < validFrame.origin.x {
+        resultFrame.origin.x = validFrame.origin.x
+    } else if resultFrame.maxX > validFrame.maxX {
+        resultFrame.origin.x = validFrame.maxX - resultFrame.width
+    }
+
+    // Adjust the y position if the frame is out of bounds
+    if resultFrame.origin.y < validFrame.origin.y {
+        resultFrame.origin.y = validFrame.origin.y
+    } else if resultFrame.maxY > validFrame.maxY {
+        resultFrame.origin.y = validFrame.maxY - resultFrame.height
+    }
+
+    // Adjust the width if the frame exceeds the validFrame's width
+    if resultFrame.width > validFrame.width {
+        resultFrame.size.width = validFrame.width
+    }
+
+    // Adjust the height if the frame exceeds the validFrame's height
+    if resultFrame.height > validFrame.height {
+        resultFrame.size.height = validFrame.height
+    }
+
+    return resultFrame
 }
 
 
@@ -180,6 +228,16 @@ class WindowObserver {
         let info = getAllWindowsWithScreenInfo()
 
         Logger.debug("app: \(info)")
-        resizeWindows(info, inset: .init(top: 0, left: 35, bottom: 0, right: 0))
+        resizeWindows(info)
+    }
+}
+
+extension NSRect {
+
+    func inset(by edge: NSEdgeInsets) -> NSRect {
+        .init(x: origin.x + edge.left,
+              y: origin.y + edge.top,
+              width: size.width - edge.left - edge.right,
+              height: size.height - edge.top - edge.bottom)
     }
 }
