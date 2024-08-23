@@ -8,14 +8,13 @@
 import Foundation
 import AppKit
 
-struct Configuration {
+class Configuration {
 
-    static let shared: Configuration = .init()
+    static var shared: Configuration = .init()
 
-    var screens: [Screen] = .init()
+    public private(set) var screens: [Screen] = .init()
 
-    private init() {
-    }
+    private init() { }
 }
 
 extension Configuration {
@@ -30,24 +29,38 @@ extension Configuration {
         UserDefaults.standard.synchronize()
     }
 
-    mutating func load() {
-        let array = UserDefaults.standard.object(forKey: keyName) as? [[String: Any]]
-        let new_screens = array?.map { Screen.init(from: $0) }
+    func load() {
+        merge(screens: NSScreen.screens.map({ Screen($0) }))
 
+        let array = UserDefaults.standard.object(forKey: keyName) as? [[String: Any]]
+
+        if let new_screens = array?.map({ Screen.init(from: $0) }) {
+            merge(screens: new_screens)
+        }
+    }
+
+    private func merge(screens new_screens: [Screen]) {
         // Merge the new incoming screen to existing list.
-        for s in new_screens ?? [] {
+        for s in new_screens {
             if let idx = screens.firstIndex(of: s) {
                 screens[idx] = s
+            } else {
+                screens.append(s)
             }
         }
     }
 }
 
-struct Screen: Equatable {
+class Screen: Equatable {
     public private(set) var screenID: Int
     public private(set) var screenName: String?
 
     var edgeInset: NSEdgeInsets
+
+    private init() {
+        screenID = 0
+        edgeInset = NSEdgeInsetsZero
+    }
 
     init(_ screen: NSScreen) {
         screenID = screen.deviceDescription[NSDeviceDescriptionKey(rawValue: "NSScreenNumber")] as? Int ?? 0
@@ -55,8 +68,12 @@ struct Screen: Equatable {
         edgeInset = NSEdgeInsetsZero
     }
 
-    static func == (lhs: Self, rhs: Self) -> Bool {
+    static func == (lhs: Screen, rhs: Screen) -> Bool {
         lhs.screenID == rhs.screenID
+    }
+
+    var descriptions: String {
+        "\(self) ID: \(screenID) Name:\(screenName ?? "<Unknown>") Insets:\(edgeInset)"
     }
 }
 
@@ -78,7 +95,8 @@ extension Screen {
         ]
     }
 
-    init(from dict: [String: Any]) {
+    convenience init(from dict: [String: Any]) {
+        self.init()
         screenID = dict[JSONKey.screenID.rawValue] as? Int ?? 0
         screenName = dict[JSONKey.screenName.rawValue] as? String
         edgeInset = NSEdgeInsetsMake(dict[JSONKey.top.rawValue] as? CGFloat ?? 0,

@@ -21,21 +21,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             button.image = NSImage(systemSymbolName: "gear", accessibilityDescription: "Edge Window")
         }
 
-        // Create the menu
         let menu = NSMenu()
 
-        // Add "About" menu item
-        let aboutItem = NSMenuItem(title: "About", action: #selector(showAbout), keyEquivalent: "")
-        menu.addItem(aboutItem)
+        let runItem = NSMenuItem(title: "Trigger", action: #selector(runAction), keyEquivalent: "")
+        menu.addItem(runItem)
 
-        // Add "Show Log" menu item
         let showLogItem = NSMenuItem(title: "Show Log", action: #selector(showLog), keyEquivalent: "")
         menu.addItem(showLogItem)
 
-        // Add separator
         menu.addItem(NSMenuItem.separator())
 
-        // Add "Quit" menu item
+        let configItem = NSMenuItem(title: "Config...", action: #selector(showSetting), keyEquivalent: "")
+        menu.addItem(configItem)
+
         let quitItem = NSMenuItem(title: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         menu.addItem(quitItem)
 
@@ -46,6 +44,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             promptForAccessibilityPermission()
             return
         }
+
+        Configuration.shared.load()
 
         windowObserver = WindowObserver()
         windowObserver.startObserving()
@@ -61,15 +61,22 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 }
 
 extension AppDelegate {
-    @objc func showAbout() {
-        // Show about window or dialog
-        print("Showing about window")
+    @objc func runAction() {
+        windowObserver.startObserving()
     }
 
     @objc func showLog() {
         if let logFileURL = Logger.logFileURL {
             NSWorkspace.shared.open(logFileURL)
         }
+    }
+
+    @objc func showSetting() {
+        let storyboard = NSStoryboard(name: "Main", bundle: nil)
+        let wc = storyboard.instantiateController(withIdentifier: "SettingWindow") as? NSWindowController
+
+        wc?.window?.makeKeyAndOrderFront(nil)
+        wc?.showWindow(nil)
     }
 
     @objc func showMenu() {
