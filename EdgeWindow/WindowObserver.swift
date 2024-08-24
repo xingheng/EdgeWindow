@@ -56,7 +56,7 @@ func getAllWindowsWithScreenInfo() -> [WindowInfo] {
 
     Logger.info("found \(runningApps.count) running app(s)")
 
-    #if DEBUG
+    #if DEBUG1
     validAppNames.append("Xcode")
     #endif
 
